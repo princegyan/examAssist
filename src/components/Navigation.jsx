@@ -30,7 +30,7 @@ export default function Navigation({ currentPage, onNavigate }) {
             </div>
             <div>
               <h1 className="text-base font-semibold leading-tight" style={{color: '#FFFFFF', textShadow: '0 1px 3px rgba(0,0,0,0.5)'}}>Inlaks T24</h1>
-              <p className="text-xs" style={{color: '#BFDBFE'}}>Exam Management</p>
+              <p className="text-xs" style={{color: '#BFDBFE'}}>Exam Dumps Management</p>
             </div>
           </div>
 
@@ -41,7 +41,7 @@ export default function Navigation({ currentPage, onNavigate }) {
               onClick={() => onNavigate('exams')}
               icon={<FolderIcon />}
             >
-              Exams
+              Dumps
             </NavButton>
             <NavButton 
               active={currentPage === 'upload'} 

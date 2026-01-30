@@ -55,8 +55,8 @@ export default function ExamList({ onSelectExam }) {
                 <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
                 <span className="text-blue-200 text-sm font-medium">Live Dashboard</span>
               </div>
-              <h1 className="text-3xl md:text-4xl font-bold mb-2" style={{color: '#FFFFFF', textShadow: '0 2px 4px rgba(0,0,0,0.5)'}}>Exam Dashboard</h1>
-              <p className="text-blue-200 text-lg">Manage your exams and track progress</p>
+              <h1 className="text-3xl md:text-4xl font-bold mb-2" style={{color: '#FFFFFF', textShadow: '0 2px 4px rgba(0,0,0,0.5)'}}>T24 Dumps Dashboard</h1>
+              <p className="text-blue-200 text-lg">Manage your dumps and track progress</p>
             </div>
             {/* 3D Cube Illustration */}
             <div className="hidden lg:block">
@@ -167,15 +167,15 @@ export default function ExamList({ onSelectExam }) {
       <div className="relative rounded-2xl p-6 mb-8 text-white overflow-hidden" style={{background: 'linear-gradient(135deg, #0F172A 0%, #1E3A5F 50%, #2563EB 100%)'}}>
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
           <div>
-            <h2 className="text-xl font-bold mb-1" style={{color: '#FFFFFF', textShadow: '0 2px 4px rgba(0,0,0,0.5)'}}>Create New Exam</h2>
-            <p className="text-blue-200 text-sm">Add a new exam code to start uploading questions</p>
+            <h2 className="text-xl font-bold mb-1" style={{color: '#FFFFFF', textShadow: '0 2px 4px rgba(0,0,0,0.5)'}}>Create New Dump</h2>
+            <p className="text-blue-200 text-sm">Add a new dump name to start uploading questions</p>
           </div>
           <form onSubmit={handleCreateExam} className="flex gap-3 flex-1 max-w-lg">
             <input
               type="text"
               value={newExamCode}
               onChange={(e) => setNewExamCode(e.target.value)}
-              placeholder="Enter exam code..."
+              placeholder="Enter dump name [ examCode - Score - Name]..."
               className="flex-1 px-4 py-2.5 bg-white/10 border border-white/20 rounded-xl text-white placeholder-blue-300/60 focus:outline-none focus:bg-white/20 focus:border-cyan-400/50 transition-all backdrop-blur-sm"
             />
             <Button
@@ -213,7 +213,7 @@ export default function ExamList({ onSelectExam }) {
       <div className="bg-white rounded-2xl border border-blue-100 shadow-sm overflow-hidden">
         <div className="px-6 py-5 border-b border-blue-50 flex items-center justify-between" style={{background: 'linear-gradient(135deg, #F8FAFC 0%, #EFF6FF 100%)'}}>
           <div>
-            <h2 className="text-lg font-bold text-gray-900">Your Exams</h2>
+            <h2 className="text-lg font-bold text-gray-900">Your T24 Dumps</h2>
             <p className="text-sm text-gray-500 mt-0.5">{exams.length} exam{exams.length !== 1 ? 's' : ''} total</p>
           </div>
           <button
