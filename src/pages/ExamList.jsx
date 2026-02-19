@@ -218,7 +218,7 @@ export default function ExamList({ onSelectExam, onNavigate }) {
               type="text"
               value={newExamCode}
               onChange={(e) => setNewExamCode(e.target.value)}
-              placeholder="Enter dump name [ examCode - Score - Name]..."
+              placeholder="Enter dump name [ examCode Score]..."
               className="flex-1 px-4 py-2.5 bg-white/10 border border-white/20 rounded-xl text-white placeholder-blue-300/60 focus:outline-none focus:bg-white/20 focus:border-cyan-400/50 transition-all backdrop-blur-sm"
             />
             <Button
