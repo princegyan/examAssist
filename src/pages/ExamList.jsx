@@ -12,6 +12,7 @@ export default function ExamList({ onSelectExam, onNavigate }) {
   const [newExamCode, setNewExamCode] = useState('')
   const [creating, setCreating] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
+  const [searchQuery, setSearchQuery] = useState('')
   const itemsPerPage = 15
 
   useEffect(() => {
@@ -70,11 +71,22 @@ export default function ExamList({ onSelectExam, onNavigate }) {
     }
   }
 
+  // Filter exams based on search query
+  const filteredExams = exams.filter(exam =>
+    exam.examCode.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+
   // Pagination logic
-  const totalPages = Math.ceil(exams.length / itemsPerPage)
+  const totalPages = Math.ceil(filteredExams.length / itemsPerPage)
   const startIndex = (currentPage - 1) * itemsPerPage
   const endIndex = startIndex + itemsPerPage
-  const paginatedExams = exams.slice(startIndex, endIndex)
+  const paginatedExams = filteredExams.slice(startIndex, endIndex)
+
+  // Handle search input change
+  const handleSearch = (e) => {
+    setSearchQuery(e.target.value)
+    setCurrentPage(1) // Reset to first page when searching
+  }
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 animate-fadeIn">
@@ -242,20 +254,63 @@ export default function ExamList({ onSelectExam, onNavigate }) {
 
       {/* Exam List Section */}
       <div className="bg-white rounded-2xl border border-blue-100 shadow-sm overflow-hidden">
-        <div className="px-6 py-5 border-b border-blue-50 flex items-center justify-between" style={{background: 'linear-gradient(135deg, #F8FAFC 0%, #EFF6FF 100%)'}}>
-          <div>
-            <h2 className="text-lg font-bold text-gray-900">Your T24 Dumps</h2>
-            <p className="text-sm text-gray-500 mt-0.5">{exams.length} exam{exams.length !== 1 ? 's' : ''} total</p>
+        <div className="px-6 py-6 border-b border-blue-50" style={{background: 'linear-gradient(135deg, #F8FAFC 0%, #EFF6FF 100%)'}}>
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                  <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9 2a1 1 0 000 2h.01a1 1 0 000-2H9z"/>
+                    <path fillRule="evenodd" d="M4 4a2 2 0 00-2 2v4a1 1 0 001 1h12a1 1 0 001-1V6a2 2 0 00-2-2H4zm12 12H4a2 2 0 00-2 2v2a1 1 0 001 1h14a1 1 0 001-1v-2a2 2 0 00-2-2z" clipRule="evenodd"/>
+                  </svg>
+                  Your T24 Dumps
+                </h2>
+                <p className="text-sm text-gray-500 mt-1">
+                  <span className="font-semibold text-gray-700">{exams.length}</span> exam{exams.length !== 1 ? 's' : ''} total
+                  {searchQuery && <span className="ml-2 text-blue-600 font-medium">• {filteredExams.length} found</span>}
+                </p>
+              </div>
+              <button
+                onClick={fetchExams}
+                className="px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 font-medium text-sm flex items-center gap-2 rounded-lg transition-all duration-200"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Refresh
+              </button>
+            </div>
+            
+            {/* Search Input */}
+            <div className="relative group">
+              <div className="absolute inset-y-0 right-12 pr-3 flex items-center pointer-events-none">
+                <svg className="w-5 h-5 text-blue-500 transition-colors group-focus-within:text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+              <input
+                type="text"
+                placeholder="Search exams by code or name..."
+                value={searchQuery}
+                onChange={handleSearch}
+                className="w-full px-4 py-3 bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-400 focus:bg-white transition-all placeholder-gray-500 text-gray-900 font-medium shadow-sm hover:border-blue-300"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => {
+                    setSearchQuery('')
+                    setCurrentPage(1)
+                  }}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all duration-200"
+                  title="Clear search"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
+            </div>
           </div>
-          <button
-            onClick={fetchExams}
-            className="text-blue-600 hover:text-blue-700 font-medium text-sm flex items-center gap-2 px-3 py-1.5 hover:bg-blue-50 rounded-lg transition-all"
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
-            Refresh
-          </button>
         </div>
         
         <div className="p-6">
@@ -279,6 +334,17 @@ export default function ExamList({ onSelectExam, onNavigate }) {
               </svg>
               <h3 className="text-lg font-bold text-gray-900 mb-1">No exams yet</h3>
               <p className="text-gray-500 text-sm">Create your first exam to get started</p>
+            </div>
+          ) : filteredExams.length === 0 ? (
+            <div className="text-center py-16">
+              <svg width="140" height="120" viewBox="0 0 140 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="mx-auto mb-6">
+                <circle cx="70" cy="55" r="45" fill="#E0E7FF" opacity="0.5"/>
+                <path d="M95 75 L110 90" stroke="#6366F1" strokeWidth="3" strokeLinecap="round"/>
+                <circle cx="70" cy="55" r="28" fill="none" stroke="#6366F1" strokeWidth="2"/>
+                <circle cx="65" cy="50" r="4" fill="#6366F1" opacity="0.6"/>
+              </svg>
+              <h3 className="text-lg font-medium text-gray-900 mb-1">No exams found</h3>
+              <p className="text-gray-500 text-sm">Try adjusting your search terms</p>
             </div>
           ) : (
             <div>
