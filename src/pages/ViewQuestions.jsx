@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import API_CONFIG from '../config/apiConfig'
+import PDFExport from '../components/PDFExport'
 
 const API_BASE = API_CONFIG.baseURL
 
@@ -70,6 +71,36 @@ export default function ViewQuestions({ examCode }) {
         <div className="absolute bottom-0 left-0 w-32 h-32 bg-cyan-400/20 rounded-full blur-2xl translate-y-1/2 -translate-x-1/4"></div>
         <div className="absolute inset-0 opacity-10" style={{backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)', backgroundSize: '30px 30px'}}></div>
       </div>
+
+      {/* Error State */}
+      {error && (
+        <div className="bg-red-50 border border-red-100 text-red-600 px-5 py-4 rounded-xl mb-6 flex items-start gap-3">
+          <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <span className="font-medium">{error}</span>
+        </div>
+      )}
+
+      {/* PDF Export Section */}
+      {questions.length > 0 && (
+        <div className="mb-8 bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                <svg className="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M8 16.5a1 1 0 11-2 0 1 1 0 012 0zM15 7a2 2 0 11-4 0 2 2 0 014 0zM12.5 1a.5.5 0 00-.5.5v1H11V1.5a.5.5 0 00-1 0v1H9V1.5a.5.5 0 00-1 0v1H7V1.5a.5.5 0 00-1 0v1H4.5a.5.5 0 00-.5.5V4H3V3.5a.5.5 0 00-1 0v1H1.5a.5.5 0 00-.5.5v.5h1v1h-1v1h1v1h-1v1h1v1h-1v.5a.5.5 0 00.5.5H2v1h1v1h-1v.5a.5.5 0 001 0v-1h1v1h1v-1h1v1h1v-1h1v1h1v-1h1v1h.5a.5.5 0 00.5-.5v-.5h1v-1h-1v-1h1v-1h-1v-1h1V4h-1V3h1V1.5a.5.5 0 00-.5-.5z" />
+                </svg>
+                Export to PDF
+              </h3>
+              <p className="text-sm text-gray-600 mt-1">Download questions as PDF documents</p>
+            </div>
+          </div>
+          <PDFExport examCode={examCode} questions={questions} mode="full" />
+        </div>
+      )}
 
       {/* Error State */}
       {error && (

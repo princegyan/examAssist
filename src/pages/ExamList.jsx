@@ -5,12 +5,14 @@ import API_CONFIG from '../config/apiConfig'
 
 const API_BASE = API_CONFIG.baseURL
 
-export default function ExamList({ onSelectExam }) {
+export default function ExamList({ onSelectExam, onNavigate }) {
   const [exams, setExams] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [newExamCode, setNewExamCode] = useState('')
   const [creating, setCreating] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 15
 
   useEffect(() => {
     fetchExams()
@@ -20,7 +22,14 @@ export default function ExamList({ onSelectExam }) {
     try {
       setLoading(true)
       const response = await axios.get(`${API_BASE}/api/exam/list`)
-      setExams(response.data.exams)
+      // Sort exams by creation date (newest first)
+      const sortedExams = response.data.exams.sort((a, b) => {
+        const dateA = new Date(a.createdAt || 0)
+        const dateB = new Date(b.createdAt || 0)
+        return dateB - dateA
+      })
+      setExams(sortedExams)
+      setCurrentPage(1) // Reset to first page when exams are fetched
     } catch (err) {
       setError('Failed to fetch exams: ' + err.message)
     } finally {
@@ -34,6 +43,23 @@ export default function ExamList({ onSelectExam }) {
 
     try {
       setCreating(true)
+      setError(null)
+      
+      // Check if exam with this code already exists
+      const existingExam = exams.find(exam => exam.examCode.toLowerCase() === newExamCode.trim().toLowerCase())
+      
+      if (existingExam) {
+        // If exam exists, navigate to upload section for it
+        setNewExamCode('')
+        setCreating(false)
+        onSelectExam(existingExam.examCode)
+        if (onNavigate) {
+          onNavigate('upload')
+        }
+        return
+      }
+      
+      // Otherwise, create new exam
       await axios.post(`${API_BASE}/api/exam/create`, { examCode: newExamCode })
       setNewExamCode('')
       await fetchExams()
@@ -43,6 +69,12 @@ export default function ExamList({ onSelectExam }) {
       setCreating(false)
     }
   }
+
+  // Pagination logic
+  const totalPages = Math.ceil(exams.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const paginatedExams = exams.slice(startIndex, endIndex)
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 animate-fadeIn">
@@ -105,8 +137,7 @@ export default function ExamList({ onSelectExam }) {
         <div className="absolute inset-0 opacity-10" style={{backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)', backgroundSize: '40px 40px'}}></div>
       </div>
 
-      {/* Stats Cards - Blockchain Blue Theme */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <div className="bg-white rounded-2xl p-5 border border-blue-100 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{background: 'linear-gradient(135deg, #2563EB 0%, #3B82F6 100%)'}}>
@@ -250,87 +281,141 @@ export default function ExamList({ onSelectExam }) {
               <p className="text-gray-500 text-sm">Create your first exam to get started</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {exams.map((exam, index) => {
-                // Banking & Finance images from Unsplash
-                const bankingImages = [
-                  'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=400&h=300&fit=crop', // Financial charts
-                  'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=300&fit=crop', // Business analytics
-                  'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=300&fit=crop', // Stock market
-                  'https://images.unsplash.com/photo-1642790106117-e829e14a795f?w=400&h=300&fit=crop', // Crypto/blockchain
-                  'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=400&h=300&fit=crop', // Credit cards
-                  'https://images.unsplash.com/photo-1518458028785-8fbcd101ebb9?w=400&h=300&fit=crop', // Money/currency
-                  'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=300&fit=crop', // Data dashboard
-                  'https://images.unsplash.com/photo-1565514020179-026b92b2d369?w=400&h=300&fit=crop', // Bank vault
-                  'https://images.unsplash.com/photo-1559526324-593bc073d938?w=400&h=300&fit=crop', // Finance meeting
-                  'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=400&h=300&fit=crop', // Calculator/accounting
-                ]
-                const imageUrl = bankingImages[index % bankingImages.length]
-                
-                return (
-                  <div
-                    key={exam._id}
-                    onClick={() => onSelectExam(exam.examCode)}
-                    className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-100 hover:border-blue-200 hover:-translate-y-1"
-                  >
-                    {/* Card Image from Unsplash */}
-                    <div className="h-40 relative overflow-hidden">
-                      <img 
-                        src={imageUrl}
-                        alt="Banking and Finance"
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                      />
-                      {/* Overlay gradient */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
-                      {/* Question count badge */}
-                      <div className="absolute top-3 left-3">
-                        <span className={`px-3 py-1.5 rounded-full text-xs font-semibold backdrop-blur-md ${
-                          exam.questionCount > 0 
-                            ? 'bg-emerald-500/90 text-white' 
-                            : 'bg-white/90 text-gray-700'
-                        }`}>
-                          {exam.questionCount || 0} Questions
-                        </span>
-                      </div>
-                      {/* Status indicator */}
-                      <div className="absolute top-3 right-3">
-                        <div className={`w-3 h-3 rounded-full ${
-                          exam.questionCount > 0 ? 'bg-emerald-400 shadow-lg shadow-emerald-400/50' : 'bg-gray-400'
-                        }`}></div>
-                      </div>
-                      {/* Exam code on image */}
-                      <div className="absolute bottom-3 left-3 right-3">
-                        <h3 className="font-bold text-lg truncate" style={{color: '#FFFFFF', textShadow: '0 2px 8px rgba(0,0,0,0.8), 0 1px 3px rgba(0,0,0,0.9)'}}>{exam.examCode}</h3>
-                      </div>
-                    </div>
-                    
-                    {/* Card Content */}
-                    <div className="p-5" style={{background: 'linear-gradient(135deg, #F8FAFC 0%, #EFF6FF 100%)'}}>
-                      <p className="text-sm mb-4" style={{color: '#374151'}}>
-                        {exam.questionCount === 0 
-                          ? 'Ready to add questions' 
-                          : `${exam.questionCount} question${exam.questionCount !== 1 ? 's' : ''} uploaded`}
-                      </p>
-                      
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2 text-blue-600 text-sm font-semibold group-hover:gap-3 transition-all">
-                          <span>Open Exam</span>
-                          <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                          </svg>
+            <div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                {paginatedExams.map((exam, index) => {
+                  // Banking & Finance images from Unsplash
+                  const bankingImages = [
+                    'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=400&h=300&fit=crop', // Financial charts
+                    'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=300&fit=crop', // Business analytics
+                    'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=300&fit=crop', // Stock market
+                    'https://images.unsplash.com/photo-1642790106117-e829e14a795f?w=400&h=300&fit=crop', // Crypto/blockchain
+                    'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=400&h=300&fit=crop', // Credit cards
+                    'https://images.unsplash.com/photo-1518458028785-8fbcd101ebb9?w=400&h=300&fit=crop', // Money/currency
+                    'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=300&fit=crop', // Data dashboard
+                    'https://images.unsplash.com/photo-1565514020179-026b92b2d369?w=400&h=300&fit=crop', // Bank vault
+                    'https://images.unsplash.com/photo-1559526324-593bc073d938?w=400&h=300&fit=crop', // Finance meeting
+                    'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=400&h=300&fit=crop', // Calculator/accounting
+                  ]
+                  const imageUrl = bankingImages[(startIndex + index) % bankingImages.length]
+                  
+                  return (
+                    <div
+                      key={exam._id}
+                      onClick={() => onSelectExam(exam.examCode)}
+                      className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-100 hover:border-blue-200 hover:-translate-y-1"
+                    >
+                      {/* Card Image from Unsplash */}
+                      <div className="h-40 relative overflow-hidden">
+                        <img 
+                          src={imageUrl}
+                          alt="Banking and Finance"
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        />
+                        {/* Overlay gradient */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+                        {/* Question count badge */}
+                        <div className="absolute top-3 left-3">
+                          <span className={`px-3 py-1.5 rounded-full text-xs font-semibold backdrop-blur-md ${
+                            exam.questionCount > 0 
+                              ? 'bg-emerald-500/90 text-white' 
+                              : 'bg-white/90 text-gray-700'
+                          }`}>
+                            {exam.questionCount || 0} Questions
+                          </span>
                         </div>
-                        <div className="flex items-center gap-1">
-                          <div className="w-6 h-6 bg-blue-500 rounded-full border-2 border-white flex items-center justify-center">
-                            <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        {/* Status indicator */}
+                        <div className="absolute top-3 right-3">
+                          <div className={`w-3 h-3 rounded-full ${
+                            exam.questionCount > 0 ? 'bg-emerald-400 shadow-lg shadow-emerald-400/50' : 'bg-gray-400'
+                          }`}></div>
+                        </div>
+                        {/* Exam code on image */}
+                        <div className="absolute bottom-3 left-3 right-3">
+                          <h3 className="font-bold text-lg truncate" style={{color: '#FFFFFF', textShadow: '0 2px 8px rgba(0,0,0,0.8), 0 1px 3px rgba(0,0,0,0.9)'}}>{exam.examCode}</h3>
+                        </div>
+                      </div>
+                      
+                      {/* Card Content */}
+                      <div className="p-5" style={{background: 'linear-gradient(135deg, #F8FAFC 0%, #EFF6FF 100%)'}}>
+                        <p className="text-sm mb-4" style={{color: '#374151'}}>
+                          {exam.questionCount === 0 
+                            ? 'Ready to add questions' 
+                            : `${exam.questionCount} question${exam.questionCount !== 1 ? 's' : ''} uploaded`}
+                        </p>
+                        <p className="text-xs text-gray-400 mb-3">
+                          Created: {new Date(exam.createdAt).toLocaleDateString()}
+                        </p>
+                        
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2 text-blue-600 text-sm font-semibold group-hover:gap-3 transition-all">
+                            <span>Open Exam</span>
+                            <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                             </svg>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <div className="w-6 h-6 bg-blue-500 rounded-full border-2 border-white flex items-center justify-center">
+                              <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                              </svg>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
+                  )
+                })}
+              </div>
+
+              {/* Pagination Controls */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-between mt-8 px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
+                  <div className="text-sm text-gray-600">
+                    Showing <span className="font-semibold">{startIndex + 1}</span> to <span className="font-semibold">{Math.min(endIndex, exams.length)}</span> of <span className="font-semibold">{exams.length}</span> exams
                   </div>
-                )
-              })}
+                  
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                      disabled={currentPage === 1}
+                      className="px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-1 transition-all disabled:opacity-50 disabled:cursor-not-allowed bg-white border border-gray-200 text-gray-700 hover:bg-gray-50"
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                      </svg>
+                      Previous
+                    </button>
+
+                    <div className="flex items-center gap-1">
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                        <button
+                          key={page}
+                          onClick={() => setCurrentPage(page)}
+                          className={`w-9 h-9 rounded-lg text-sm font-medium transition-all ${
+                            currentPage === page
+                              ? 'bg-blue-600 text-white shadow-lg shadow-blue-200'
+                              : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
+                          }`}
+                        >
+                          {page}
+                        </button>
+                      ))}
+                    </div>
+
+                    <button
+                      onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                      disabled={currentPage === totalPages}
+                      className="px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-1 transition-all disabled:opacity-50 disabled:cursor-not-allowed bg-white border border-gray-200 text-gray-700 hover:bg-gray-50"
+                    >
+                      Next
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>

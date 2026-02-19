@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-label="Temenos T24">
+  <defs>
+    <linearGradient id="grad-blue" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#1E3A8A"/>
+      <stop offset="100%" stop-color="#0EA5E9"/>
+    </linearGradient>
+    <linearGradient id="grad-orange" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#F97316"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
+    </linearGradient>
+    <linearGradient id="grad-gold" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#FBBF24"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
+    </linearGradient>
+  </defs>
+  <rect width="160" height="160" rx="28" fill="#0B1021"/>
+  <g transform="translate(20 18)">
+    <circle cx="40" cy="20" r="16" fill="#E5E7EB" stroke="url(#grad-blue)" stroke-width="4"/>
+    <circle cx="95" cy="18" r="16" fill="#E5E7EB" stroke="url(#grad-orange)" stroke-width="4"/>
+    <circle cx="68" cy="42" r="15" fill="#E5E7EB" stroke="url(#grad-gold)" stroke-width="4"/>
+    <path d="M26 52c0-14 10-24 22-24s22 10 22 24c0 14-10 40-22 58C36 92 26 66 26 52Z" fill="#E5E7EB" stroke="url(#grad-blue)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M82 48c0-13 9-22 20-22s20 9 20 22c0 13-9 37-20 52-11-15-20-39-20-52Z" fill="#E5E7EB" stroke="url(#grad-orange)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M52 64c0-10 8-18 16-18s16 8 16 18c0 10-8 28-16 40-8-12-16-30-16-40Z" fill="#E5E7EB" stroke="url(#grad-gold)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

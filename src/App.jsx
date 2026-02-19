@@ -24,7 +24,7 @@ function App() {
       
       <main className="container mx-auto px-4 py-8">
         {currentPage === 'exams' && (
-          <ExamList onSelectExam={(exam) => handleNavigation('upload', exam)} />
+          <ExamList onSelectExam={(exam) => handleNavigation('upload', exam)} onNavigate={handleNavigation} />
         )}
         {currentPage === 'upload' && selectedExam && (
           <UploadQuestion examCode={selectedExam} onNavigate={handleNavigation} />

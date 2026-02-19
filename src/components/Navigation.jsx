@@ -3,6 +3,9 @@ import axios from 'axios'
 
 const API_BASE = 'https://inlaks-t24-backend.vercel.app'
 
+// PNG logo served from public directory
+const LOGO_SRC = '/new%20logo.png'
+
 export default function Navigation({ currentPage, onNavigate }) {
   const [showHelp, setShowHelp] = useState(false)
   const [sampleImage, setSampleImage] = useState(null)
@@ -15,21 +18,21 @@ export default function Navigation({ currentPage, onNavigate }) {
           {/* Logo & Brand */}
           <div className="flex items-center gap-3">
             <img 
-              src="https://ghana.inlaks.com/wp-content/uploads/2019/08/Inlaks-Favicon.png" 
-              alt="Inlaks Logo" 
-              className="h-9 w-auto object-contain"
+              src={LOGO_SRC}
+              alt="Product Logo" 
+              className="h-11 w-auto object-contain"
               onError={(e) => {
                 e.target.style.display = 'none';
                 e.target.nextSibling.style.display = 'flex';
               }}
             />
-            <div className="w-9 h-9 bg-gradient-to-br from-blue-400 to-cyan-400 rounded-xl items-center justify-center shadow-lg shadow-blue-500/25 hidden">
+            <div className="w-11 h-11 bg-gradient-to-br from-blue-500 via-sky-400 to-amber-300 rounded-xl items-center justify-center shadow-lg shadow-blue-500/25 hidden">
               <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </div>
             <div>
-              <h1 className="text-base font-semibold leading-tight" style={{color: '#FFFFFF', textShadow: '0 1px 3px rgba(0,0,0,0.5)'}}>Inlaks T24</h1>
+              <h1 className="text-base font-semibold leading-tight" style={{color: '#FFFFFF', textShadow: '0 1px 3px rgba(0,0,0,0.5)'}}>Temenos T24</h1>
               <p className="text-xs" style={{color: '#BFDBFE'}}>Exam Dumps Management</p>
             </div>
           </div>
@@ -335,6 +338,14 @@ function CompareIcon() {
   return (
     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+    </svg>
+  )
+}
+
+function EditIcon() {
+  return (
+    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
     </svg>
   )
 }

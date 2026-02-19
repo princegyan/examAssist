@@ -2,6 +2,7 @@ import { useState } from 'react'
 import axios from 'axios'
 import { Button } from '../components/Button'
 import API_CONFIG from '../config/apiConfig'
+import ImageCropper from '../components/ImageCropper'
 
 const API_BASE = API_CONFIG.baseURL
 
@@ -20,6 +21,8 @@ export default function UploadQuestion({ examCode, onNavigate }) {
   const [loadingText, setLoadingText] = useState(false)
   const [showRawResponse, setShowRawResponse] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0) // For bulk upload progress
+  const [showCropper, setShowCropper] = useState(false) // For image cropper
+  const [originalPreview, setOriginalPreview] = useState(null) // Store original for cropping
 
   const handleFileSelect = (e) => {
     const file = e.target.files[0]
@@ -27,11 +30,25 @@ export default function UploadQuestion({ examCode, onNavigate }) {
       setSelectedFile(file)
       const reader = new FileReader()
       reader.onload = (e) => {
+        setOriginalPreview(e.target.result)
         setPreview(e.target.result)
+        setShowCropper(true) // Show cropper when image is selected
       }
       reader.readAsDataURL(file)
       setError(null)
     }
+  }
+
+  // Handle crop result
+  const handleCropComplete = ({ file, dataUrl }) => {
+    setSelectedFile(file)
+    setPreview(dataUrl)
+    setShowCropper(false)
+  }
+
+  // Skip cropping and use original
+  const handleCropCancel = () => {
+    setShowCropper(false)
   }
 
   // Handle multiple file selection for bulk upload
@@ -266,7 +283,7 @@ export default function UploadQuestion({ examCode, onNavigate }) {
           )}
 
           {/* Single Upload Form */}
-          {uploadMode === 'single' && (
+          {uploadMode === 'single' && !showCropper && (
           <form onSubmit={handleUpload} className="space-y-6">
             {/* Dropzone */}
             <div className={`
@@ -288,7 +305,23 @@ export default function UploadQuestion({ examCode, onNavigate }) {
                   <div className="space-y-4">
                     <img src={preview} alt="Preview" className="max-h-64 mx-auto rounded-xl shadow-sm" />
                     <p className="text-gray-500 text-sm">{selectedFile?.name}</p>
-                    <p className="text-blue-500 text-sm font-medium hover:underline">Click to change image</p>
+                    <div className="flex items-center justify-center gap-4">
+                      <p className="text-blue-500 text-sm font-medium hover:underline">Click to change image</p>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          e.stopPropagation()
+                          setShowCropper(true)
+                        }}
+                        className="text-purple-500 text-sm font-medium hover:underline flex items-center gap-1"
+                      >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        Crop Image
+                      </button>
+                    </div>
                   </div>
                 ) : (
                   <div className="space-y-4">
@@ -328,6 +361,15 @@ export default function UploadQuestion({ examCode, onNavigate }) {
               )}
             </Button>
           </form>
+          )}
+
+          {/* Image Cropper */}
+          {uploadMode === 'single' && showCropper && originalPreview && (
+            <ImageCropper
+              imageSrc={originalPreview}
+              onCrop={handleCropComplete}
+              onCancel={handleCropCancel}
+            />
           )}
 
           {/* Bulk Upload Form */}
